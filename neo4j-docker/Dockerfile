@@ -3,7 +3,7 @@ FROM neo4j:5.20.0-community
 ENV NEO4J_AUTH=neo4j/test
 
 RUN mkdir /import
-COPY ../dataset/flipkart_com-ecommerce_sample.csv import.cypher /import/
+COPY flipkart_convertido.csv import.cypher /import/
 
 ENV NEO4JLABS_PLUGINS='["apoc"]'
 ENV NEO4J_dbms_security_procedures_unrestricted=apoc.*
