@@ -12,8 +12,7 @@ CREATE TABLE products (
   description TEXT,
   product_rating TEXT,
   overall_rating TEXT,
-  brand TEXT,
-  product_specifications TEXT
+  brand TEXT
 );
 
 COPY products FROM '/docker-entrypoint-initdb.d/products.csv' DELIMITER ';' CSV HEADER;
