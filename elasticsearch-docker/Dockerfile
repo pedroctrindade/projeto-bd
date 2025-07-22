@@ -1,6 +1,6 @@
 FROM docker.elastic.co/elasticsearch/elasticsearch:8.13.4
 
-COPY products.csv /usr/share/elasticsearch/products.csv
+COPY ../dataset/flipkart_com-ecommerce_sample.csv /usr/share/elasticsearch/products.csv
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh

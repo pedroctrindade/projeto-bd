@@ -1,2 +1,0 @@
-product_url,product_name,product_category_tree,pid,retail_price,discounted_price,image,is_FK_Advantage_product,description,product_rating,overall_rating,brand,product_specifications
-http://example.com/product1,Product 1,"["Electronics","Camera"]",12345,100.0,80.0,http://example.com/img1.jpg,true,"Camera with 4K resolution",4.5,4.0,Sony,"{battery: '2xAA', resolution: '4K'}"
