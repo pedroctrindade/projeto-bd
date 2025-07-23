@@ -16,12 +16,10 @@ mapping = {
             "product_name": {"type": "text"},
             "product_category_tree": {"type": "text"},
             "description": {"type": "text"},
-            "product_specification": {
-                "type": "nested",
-                "properties": {
-                    "key": {"type": "keyword"},
-                    "value": {"type": "text"}
-                }
+            "product_specification": {  "type": "text" },
+            "text_search": {
+                "type": "text",
+                "analyzer": "english"
             }
         }
     }
@@ -86,7 +84,8 @@ def generate_docs(df):
                 "product_name": remove_stopwords(row["product_name"]),
                 "product_category_tree": remove_stopwords(row["product_category_tree"]),
                 "description": remove_stopwords(row["description"]),
-                "product_specifications": remove_stopwords(row["product_specifications"])
+                "product_specifications": remove_stopwords(row["product_specifications"]),
+                "text_search": remove_stopwords(f"{row['product_name']} {row['product_category_tree']} {row['description']} {row['product_specifications']}")
             }
         }
 
@@ -130,8 +129,18 @@ def postgresql_ingest():
                 product_name TEXT,
                 product_category_tree TEXT,
                 description TEXT,
-                product_specifications TEXT
+                product_specifications TEXT,
+                text_search tsvector GENERATED ALWAYS AS (
+                    to_tsvector(
+                        'english',
+                        coalesce(product_name, '') || ' ' ||
+                        coalesce(product_category_tree, '') || ' ' ||
+                        coalesce(description, '') || ' ' ||
+                        coalesce(product_specifications, '')
+                    )
+                ) STORED
             );
+            CREATE INDEX idx_text_search ON products USING GIN (text_search);
         """)
         conn.commit()
 
@@ -151,9 +160,9 @@ def postgresql_ingest():
         print("Erro durante a ingestão:", e)
  
 def main():
-
-    elasticsearch_ingest()
     postgresql_ingest()
+    elasticsearch_ingest()
+
 
 if __name__ == "__main__":
     main()
