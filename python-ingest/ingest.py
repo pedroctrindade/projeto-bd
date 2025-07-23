@@ -4,8 +4,8 @@ import json
 import re
 from elasticsearch import Elasticsearch, helpers
 
-es = Elasticsearch("http://localhost:9200")
-pg_host = "localhost"
+es = Elasticsearch("http://es_db:9200")
+pg_host = "pg_db"
 
 INDEX_NAME = "products"
 
@@ -49,7 +49,7 @@ def remove_stopwords(text):
     return ' '.join(filtered)
 
 def create_index():
-    if es.indices.exists(INDEX_NAME):
+    if es.indices.exists(index=INDEX_NAME):
         print(f"Índice {INDEX_NAME} já existe. Apagando e recriando...")
         es.indices.delete(index=INDEX_NAME)
     es.indices.create(index=INDEX_NAME, body=mapping)
@@ -152,7 +152,7 @@ def postgresql_ingest():
  
 def main():
 
-    #elasticsearch_ingest()
+    elasticsearch_ingest()
     postgresql_ingest()
 
 if __name__ == "__main__":

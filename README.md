@@ -1,6 +1,6 @@
 # Multi-Database Query Benchmark
 
-Este projeto compara o desempenho de consultas no campo `description` usando três bancos de dados diferentes:
+Este projeto compara o desempenho de consultas textuais usando três bancos de dados diferentes:
 
 - 🔵 PostgreSQL
 - 🟣 Neo4j
