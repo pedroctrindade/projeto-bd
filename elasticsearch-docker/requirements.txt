@@ -1,0 +1,4 @@
+pandas
+elasticsearch==7.17.6
+psycopg2-binary
+requests

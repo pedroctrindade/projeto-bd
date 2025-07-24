@@ -5,7 +5,7 @@ import re
 from elasticsearch import Elasticsearch, helpers
 
 es = Elasticsearch("http://es_db:9200")
-pg_host = "pg_db"
+pg_host = "localhost"
 
 INDEX_NAME = "products"
 
@@ -15,7 +15,7 @@ mapping = {
         "properties": {
             "product_name": {"type": "text"},
             "product_category_tree": {"type": "text"},
-            "description": {"type": "text"},
+            "description": {"type": "keyword"},
             "product_specification": {  "type": "text" },
             "text_search": {
                 "type": "text",
@@ -161,7 +161,7 @@ def postgresql_ingest():
  
 def main():
     postgresql_ingest()
-    elasticsearch_ingest()
+    #elasticsearch_ingest()
 
 
 if __name__ == "__main__":

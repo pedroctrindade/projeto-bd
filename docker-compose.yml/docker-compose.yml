@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pctrindade/unicamp-25:postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+
+  elasticsearch:
+    image: pctrindade/unicamp-25:elasticsearch
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+
+#  neo4j_attribute:
+#    image: luizhenriquebritto/unicamp-25:neo4j-attribute-strategy
+#    container_name: neo4j_attribute
+#    ports:
+#      - "7474:7474"
+#      - "7687:7687"
+#    environment:
+#      - NEO4J_AUTH=neo4j/test
+#
+#  neo4j_inverted:
+#    image: luizhenriquebritto/unicamp-25:neo4j-inverted-index-strategy
+#    container_name: neo4j_inverted
+#    ports:
+#      - "7475:7474"
+#      - "7688:7687"
+#    environment:
+#      - NEO4J_AUTH=neo4j/test
+#
