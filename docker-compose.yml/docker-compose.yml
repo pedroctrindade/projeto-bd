@@ -1,4 +1,4 @@
-version: '3.8'
+version: '2.4'
 
 services:
   postgres:
@@ -6,13 +6,14 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
+    mem_limit: 1024m
 
   elasticsearch:
     image: pctrindade/unicamp-25:elasticsearch
     container_name: elasticsearch
     ports:
       - "9200:9200"
-
+    mem_limit: 1024m
 #  neo4j_attribute:
 #    image: luizhenriquebritto/unicamp-25:neo4j-attribute-strategy
 #    container_name: neo4j_attribute
@@ -30,4 +31,3 @@ services:
 #      - "7688:7687"
 #    environment:
 #      - NEO4J_AUTH=neo4j/test
-#

@@ -2,18 +2,22 @@ import time
 import psycopg2
 from elasticsearch import Elasticsearch
 from neo4j import GraphDatabase
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def benchmark_postgres():
     print("PostgreSQL:")
 
     conn = psycopg2.connect(
-        dbname="postgres",
+        dbname="products_db",
         user="postgres",
         password="postgres",
         host="localhost",
         port="5432"
     )
     cur = conn.cursor()
+
+
 
     # Query 1: campo description sem índice
     query1 = """SELECT uniq_id, product_name FROM products 
@@ -23,14 +27,15 @@ def benchmark_postgres():
     cur.execute(query1)
     r1 = cur.fetchall()
     d1 = time.time() - start1
-
+    
     # Query 2: campo text_search com índice FTS
     query2 = """SELECT uniq_id, product_name FROM products 
-                WHERE text_search @@ plainto_tsquery('portuguese', 'solid shorts');"""
+                WHERE text_search @@ plainto_tsquery('english', 'solid shorts');"""
     start2 = time.time()
     cur.execute(query2)
     r2 = cur.fetchall()
     d2 = time.time() - start2
+
 
     print(f"  Query 1 (description): {len(r1)} resultados em {d1:.4f} s")
     print(f"  Query 2 (text_search): {len(r2)} resultados em {d2:.4f} s\n")
@@ -45,11 +50,15 @@ def benchmark_elasticsearch():
     # Query 1 – match no campo description (sem FTS especial)
     query1 = {
         "query": {
-            "match": {
-                "description": "solid shorts"
+            "regexp": {
+                "description": {
+                    "value": ".*solid.*shorts.*",
+                    "case_insensitive": True
+                }
             }
         }
     }
+
     start1 = time.time()
     r1 = es.search(index="products", body=query1)
     d1 = time.time() - start1
@@ -58,7 +67,7 @@ def benchmark_elasticsearch():
     query2 = {
         "query": {
             "match": {
-                "text_search": "bsolid shorts"
+                "text_search": "solid shorts"
             }
         }
     }
