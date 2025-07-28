@@ -75,6 +75,8 @@ def create_product_node(tx, product_id, product_name, category_tree_values, desc
                description=description, specification=specification,text_search=text_search)
     except Exception as e:
         print(f"Error creating product node for {product_id}: {e}")
+    
+
 
 def process_csv(file_path, driver):
     """Process CSV and insert data into Neo4j."""
@@ -105,6 +107,10 @@ def process_csv(file_path, driver):
                 
                 # if i == 10:  # Limit processing to 10 rows for testing
                 #     break
+    #session.run("""
+    #    CREATE FULLTEXT INDEX full_text_search_index
+    #    FOR (n:Product) ON EACH [n.text_search]
+    #    """)
 
 if __name__ == "__main__":
     # Configuration

@@ -14,20 +14,23 @@ services:
     ports:
       - "9200:9200"
     mem_limit: 1024m
-#  neo4j_attribute:
-#    image: luizhenriquebritto/unicamp-25:neo4j-attribute-strategy
-#    container_name: neo4j_attribute
-#    ports:
-#      - "7474:7474"
-#      - "7687:7687"
-#    environment:
-#      - NEO4J_AUTH=neo4j/test
-#
-#  neo4j_inverted:
-#    image: luizhenriquebritto/unicamp-25:neo4j-inverted-index-strategy
-#    container_name: neo4j_inverted
-#    ports:
-#      - "7475:7474"
-#      - "7688:7687"
-#    environment:
-#      - NEO4J_AUTH=neo4j/test
+  
+  neo4j_attribute:
+    image: pctrindade/unicamp-25:neo4j_attribute
+    container_name: neo4j_attribute_strategy
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/produtounicamp
+    mem_limit: 1024m
+
+  neo4j_inverted:
+    image: luizbritto/unicamp_25_bd:word_strategy_buildx_full
+    container_name: neo4j_word_strategy
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/produtounicamp
+    mem_limit: 1024m

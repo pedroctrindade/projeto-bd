@@ -17,20 +17,18 @@ def benchmark_postgres():
     )
     cur = conn.cursor()
 
-
-
     # Query 1: campo description sem índice
     query1 = """SELECT uniq_id, product_name FROM products 
                 WHERE to_tsvector('english', coalesce(description, '')) 
-                @@ plainto_tsquery('english', 'solid shorts');"""
+                @@ plainto_tsquery('english', 'short short short short short short short');"""
     start1 = time.time()
     cur.execute(query1)
     r1 = cur.fetchall()
     d1 = time.time() - start1
-    
+
     # Query 2: campo text_search com índice FTS
     query2 = """SELECT uniq_id, product_name FROM products 
-                WHERE text_search @@ plainto_tsquery('english', 'solid shorts');"""
+                WHERE text_search @@ plainto_tsquery('english', 'short short short short short short short');"""
     start2 = time.time()
     cur.execute(query2)
     r2 = cur.fetchall()
@@ -52,7 +50,7 @@ def benchmark_elasticsearch():
         "query": {
             "regexp": {
                 "description": {
-                    "value": ".*solid.*shorts.*",
+                    "value": ".*short.*",
                     "case_insensitive": True
                 }
             }
@@ -67,7 +65,7 @@ def benchmark_elasticsearch():
     query2 = {
         "query": {
             "match": {
-                "text_search": "solid shorts"
+                "text_search": "short"
             }
         }
     }
@@ -79,33 +77,43 @@ def benchmark_elasticsearch():
     print(f"  Query 2 (text_search): {r2['hits']['total']['value']} resultados em {d2:.4f} s\n")
 
 
-def benchmark_neo4j(uri, name):
-    print(f"Neo4j ({name}):")
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "test"))
+def benchmark_neo4j_words(uri, name):
+    print(f"Neo4j Word Strategy ({name}):")
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "produtounicamp"))
 
     # Query 1 – campo description (sem índice direto)
     query1 = """
-    MATCH (p:Product)
-    WHERE p.description CONTAINS 'solid' AND p.description CONTAINS 'shorts'
-    RETURN p.uniq_id, p.product_name
+        WITH ["short"] AS input_words
+        MATCH (w:Word)-[r]->(p:Product)
+        WHERE w.word IN input_words
+        WITH p, count(w) AS matched_words
+        RETURN p, matched_words
+        ORDER BY matched_words DESC
     """
     with driver.session() as session:
         start1 = time.time()
         r1 = list(session.run(query1))
         d1 = time.time() - start1
 
+    print(f"  Query 1 (word strategy): {len(r1)} resultados em {d1:.4f} s")
+    driver.close()
+
+def benchmark_neo4j_attribute(uri, name):
+    print(f"Neo4j ({name}):")
+    driver = GraphDatabase.driver(uri, auth=("neo4j", "produtounicamp"))
+
     # Query 2 – campo text_search (com estratégia de indexação invertida ou atributo)
     query2 = """
-    MATCH (p:Product)
-    WHERE p.text_search CONTAINS 'bicicleta' AND p.text_search CONTAINS 'feminina' AND p.text_search CONTAINS 'algodão'
-    RETURN p.uniq_id, p.product_name
+        CALL db.index.fulltext.queryNodes("full_text_search_index", "short") YIELD node, score
+        RETURN node.name, score
+        ORDER BY score DESC
     """
+
     with driver.session() as session:
         start2 = time.time()
         r2 = list(session.run(query2))
         d2 = time.time() - start2
 
-    print(f"  Query 1 (description): {len(r1)} resultados em {d1:.4f} s")
     print(f"  Query 2 (text_search): {len(r2)} resultados em {d2:.4f} s\n")
     driver.close()
 
@@ -115,5 +123,6 @@ if __name__ == "__main__":
 
     benchmark_postgres()
     benchmark_elasticsearch()
-    #benchmark_neo4j("bolt://localhost:7687", "attribute-strategy")
-    #benchmark_neo4j("bolt://localhost:7688", "inverted-index-strategy")
+    benchmark_neo4j_words("bolt://localhost:7688", "inverted-index-strategy")
+    benchmark_neo4j_attribute("bolt://localhost:7687", "attribute-strategy")
+
